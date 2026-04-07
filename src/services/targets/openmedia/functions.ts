@@ -29,13 +29,32 @@ type OpenMediaUploadResponse = {
   }
   reused?: boolean
   error?: string
+  // 409 Conflict — active download in progress
   existingJobId?: string
   existingStatus?: string
+  // 200 alreadyAvailable — film already on S3
+  alreadyAvailable?: boolean
+  message?: string
+  movie?: {
+    id: string
+    titleEn: string
+    titleDe?: string
+  }
+  // 410 Gone — NZB is broken
+  reason?: string
+  failedAttempts?: number
+  hint?: string
 }
 
 /**
  * Push an NZB file to the OpenMedia API.
  * Sends the NZB content as a JSON string to POST /downloads/request.
+ *
+ * Handles these response codes:
+ * - 201: Download job created
+ * - 200 alreadyAvailable: Film already on S3 (no download needed)
+ * - 409: Active download already running for this NZB
+ * - 410: NZB is marked as broken (3+ failed attempts) — user should find another version
  */
 export const push = async (
   nzb: NZBFileObject,
@@ -88,12 +107,32 @@ export const push = async (
         return
       }
 
+      if (response.status === 200 && data.alreadyAvailable) {
+        // Film is already on S3 — no download needed. Not an error.
+        const movieTitle = data.movie?.titleEn || nzb.title
+        log.info(
+          `"${movieTitle}" is already available on ${targetSettings.name} — no download needed`
+        )
+        // Throw a "soft" info error so the UI shows the message to the user
+        throw new Error(i18n.t('targets.openmedia.errors.alreadyAvailable', [movieTitle]))
+      }
+
       if (response.status === 409) {
         // Active download already exists — not an error per se
         log.info(
           `download already active for "${nzb.title}" on ${targetSettings.name} — job ${data.existingJobId} (${data.existingStatus})`
         )
         throw new Error(data.error || i18n.t('errors.unknownError'))
+      }
+
+      if (response.status === 410) {
+        // NZB is broken — user should find a different version
+        const attempts = data.failedAttempts ?? 0
+        const reason = data.reason || i18n.t('errors.unknownError')
+        log.info(
+          `NZB rejected as broken by ${targetSettings.name} — ${attempts} failures: ${reason}`
+        )
+        throw new Error(i18n.t('targets.openmedia.errors.brokenNzb', [String(attempts), reason]))
       }
 
       throw new Error(data.error || `HTTP ${response.status}`)

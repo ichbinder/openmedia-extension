@@ -403,7 +403,11 @@
       "description": "an Torbox.app senden"
     },
     "openmedia": {
-      "description": "an OpenMedia API senden"
+      "description": "an OpenMedia API senden",
+      "errors": {
+        "alreadyAvailable": "„$1“ ist bereits in deiner Bibliothek verfügbar — kein Download nötig.",
+        "brokenNzb": "Diese NZB-Datei ist nach $1 fehlgeschlagenen Downloads als kaputt markiert. Bitte eine andere Version dieses Films suchen. ($2)"
+      }
     }
   },
   "contextMenu": {
