@@ -10,6 +10,7 @@ import NZBDonkeyLogo from '@/components/nzbdonkeyLogo.vue'
 import DownloadSettings from '@/components/targets/downloadSettings.vue'
 import JDownloaderSettings from '@/components/targets/jdownloaderSettings.vue'
 import NzbgetSettings from '@/components/targets/nzbgetSettings.vue'
+import OpenmediaSettings from '@/components/targets/openmediaSettings.vue'
 import PremiumizeSettings from '@/components/targets/premiumizeSettings.vue'
 import SabnzbdSettings from '@/components/targets/sabnzbdSettings.vue'
 import SynologySettings from '@/components/targets/synologySettings.vue'
@@ -154,6 +155,13 @@ function confirmAdvancedSettings() {
         />
         <NzbgetSettings
           v-if="targetSettings.type === 'nzbget'"
+          v-model:target-settings="targetSettings"
+          v-model:test-connection="testConnection"
+          v-model:connection-successful="connectionSuccessful"
+          v-model:show-advanced-settings="showAdvancedSettings"
+        />
+        <OpenmediaSettings
+          v-if="targetSettings.type === 'openmedia'"
           v-model:target-settings="targetSettings"
           v-model:test-connection="testConnection"
           v-model:connection-successful="connectionSuccessful"

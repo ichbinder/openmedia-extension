@@ -1,7 +1,7 @@
 {
   "extension": {
-    "name": "NZBDonkey",
-    "description": "The ultimate NZB file download tool!"
+    "name": "OpenMedia",
+    "description": "NZB downloader with on-demand cloud processing — based on NZBDonkey"
   },
   "menu": {
     "settings": {
@@ -401,6 +401,9 @@
     },
     "torbox": {
       "description": "send to Torbox.app"
+    },
+    "openmedia": {
+      "description": "send to OpenMedia API"
     }
   },
   "contextMenu": {

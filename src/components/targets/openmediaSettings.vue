@@ -1,0 +1,92 @@
+<script setup lang="ts">
+import { FormField } from '@primevue/forms'
+import { InputText, Message } from 'primevue'
+import { Ref, watch } from 'vue'
+
+import { i18n } from '#i18n'
+import TimeoutInput from '@/components/inputs/timeoutInput.vue'
+import TestConnectionDialog from '@/components/targets/targetTestConnectionDialog.vue'
+import { requiredResolver } from '@/services/resolvers'
+import * as targets from '@/services/targets'
+
+const targetSettings = defineModel('targetSettings') as Ref<
+  targets.TargetSettings & { settings: targets.openmedia.Settings }
+>
+const showTestConnectionDialog = defineModel('testConnection') as Ref<boolean>
+const connectionSuccessful = defineModel('connectionSuccessful') as Ref<boolean>
+defineModel('showAdvancedSettings') as Ref<boolean>
+
+watch(
+  targetSettings.value.settings,
+  () => {
+    if (connectionSuccessful.value) {
+      connectionSuccessful.value = false
+    }
+  },
+  { deep: true }
+)
+</script>
+
+<template>
+  <div class="flex items-center gap-4 mb-4 flex-auto">
+    <label for="apiUrl" class="font-semibold w-24 text-right">{{ i18n.t('common.settings.url') }}</label>
+    <FormField
+      v-slot="$field"
+      :name="i18n.t('common.settings.url')"
+      :initial-value="targetSettings.settings.apiUrl"
+      :resolver="requiredResolver"
+      :validate-on-blur="true"
+      :validate-on-value-update="true"
+      :validate-on-mount="true"
+      class="grid-row flex-auto"
+    >
+      <InputText
+        id="apiUrl"
+        v-model="targetSettings.settings.apiUrl as string"
+        class="w-full"
+        size="small"
+        autocomplete="off"
+        type="url"
+        placeholder="https://api.mediatoken.de"
+      />
+      <Message v-if="$field?.invalid" severity="error" size="small" variant="simple" class="flex-auto">{{
+        $field.error?.message
+      }}</Message>
+    </FormField>
+  </div>
+  <div class="flex items-center gap-4 mb-4 flex-auto">
+    <label for="apiToken" class="font-semibold w-24 text-right">{{ i18n.t('common.settings.apiKey') }}</label>
+    <FormField
+      v-slot="$field"
+      :name="i18n.t('common.settings.apiKey')"
+      :initial-value="targetSettings.settings.apiToken"
+      :resolver="requiredResolver"
+      :validate-on-blur="true"
+      :validate-on-value-update="true"
+      :validate-on-mount="true"
+      class="grid-row flex-auto"
+    >
+      <InputText
+        id="apiToken"
+        v-model="targetSettings.settings.apiToken as string"
+        class="w-full"
+        size="small"
+        autocomplete="off"
+        type="password"
+        :placeholder="i18n.t('common.settings.apiKey')"
+      />
+      <Message v-if="$field?.invalid" severity="error" size="small" variant="simple" class="flex-auto">{{
+        $field.error?.message
+      }}</Message>
+    </FormField>
+  </div>
+  <div class="flex items-center gap-4 mb-4">
+    <label for="timeout" class="font-semibold w-24 text-right">{{ i18n.t('common.settings.timeout.title') }}</label>
+    <TimeoutInput v-model="targetSettings.settings.timeout" />
+  </div>
+  <TestConnectionDialog
+    v-model:show-test-connection-dialog="showTestConnectionDialog"
+    v-model:target-settings="targetSettings"
+    @success="(value) => (connectionSuccessful = value)"
+  />
+</template>

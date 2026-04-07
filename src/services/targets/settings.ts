@@ -1,6 +1,7 @@
 import { Settings as DownloadSettings } from './download'
 import { Settings as JDownloaderSettings } from './jdownloader'
 import { Settings as NzbgetSettings } from './nzbget'
+import { Settings as OpenmediaSettings } from './openmedia'
 import { Settings as PremiumizeSettings } from './premiumize'
 import { Settings as SabnzbdSettings } from './sabnzbd'
 import { Settings as SynologySettings } from './synology'
@@ -29,6 +30,7 @@ export type TargetSettings = {
     | DownloadSettings
     | JDownloaderSettings
     | NzbgetSettings
+    | OpenmediaSettings
     | PremiumizeSettings
     | SabnzbdSettings
     | SynologySettings
@@ -36,7 +38,7 @@ export type TargetSettings = {
   categories: CategoriesSettings
 }
 
-export type TargetType = 'download' | 'jdownloader' | 'nzbget' | 'premiumize' | 'sabnzbd' | 'synology' | 'torbox'
+export type TargetType = 'download' | 'jdownloader' | 'nzbget' | 'openmedia' | 'premiumize' | 'sabnzbd' | 'synology' | 'torbox'
 
 export const use = async () => useSettings<Settings>({ name, defaults: defaultSettings })
 export const get = async () => getSettings<Settings>({ name, defaults: defaultSettings })
